@@ -1,0 +1,49 @@
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+
+   body {
+       padding-top: 50px;
+       padding-bottom: 20px;
+   }
+   .map-container-2 {
+     overflow: hidden;
+     padding-bottom: 56.25%;
+     position: relative;
+     height: 0;
+   }
+
+   .map-container-2 iframe {
+     left: 0;
+     top: 0;
+     height: 100%;
+     width: 100%;
+     position: absolute;
+   }
+
+   .text-justify {
+    text-align: justify;
+  }
+.imgimg{
+
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+
+
+
+
+
+
+
+
+
+
+

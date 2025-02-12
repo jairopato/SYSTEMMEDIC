@@ -1,0 +1,26 @@
+.my-button {
+    padding: 10px 20px;
+    background-color: #222;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    float: right;
+  }
+  .my-button:hover {
+    background-color: #222;
+  }
+  .my-button:active {
+    background-color: #080808;
+  }
+  input[type=button] {
+    background-color: #222;
+    border-color: #080808;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+    margin: 10px;
+  }

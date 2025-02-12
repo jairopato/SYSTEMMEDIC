@@ -1,0 +1,260 @@
+var Latant=  null;
+var Lngant = null;
+var Latitud =  null;
+var Longitud = null;
+//-------------------------------------------------------------
+$(document).ready(function(){
+
+        });
+//--------------------------------------------------------------------------------------------
+
+var customLabel = {
+   restaurant: {
+       label: 'R'
+   },
+   bar: {
+       label: 'B'
+   }
+};
+
+function initMap() {
+
+//---------------------------------------------------------------------
+
+
+
+if (navigator.geolocation)
+{
+//------------------------------------------------------
+//Pedimos los datos de geolocalizacion al navegador del USUARIO
+navigator.geolocation.getCurrentPosition(
+ //Si el navegador entrega los datos de geolocalizacion los imprimimos
+ function (position) {
+   Latitud = position.coords.latitude;
+   Longitud = position.coords.longitude;
+
+   //Latitud = -1.705905;
+   //Longitud = -78.640717;
+
+     var coord = {lat: Latitud ,lng: Longitud};
+     var map = new google.maps.Map(document.getElementById('map-container-google-2'),{
+       zoom: 16,
+       center: coord
+     });
+     
+     var marker = new google.maps.Marker({
+       position: coord,
+       map: map,
+       icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+       title: 'Estás Aquí',
+       visible:true,
+       labelContent: "Estás Aquí",
+       labelAnchor: new google.maps.Point(50, 70),
+       labelClass: "labels" // the CSS class for the label
+     });
+   
+
+//---------------------------Colocar Paradas en el Sector----------------------------------------
+
+
+   var infoWindow = new google.maps.InfoWindow;
+   //downloadUrl('http://localhost/SystemGeoLoca/php/xml.php', function(data) {
+   downloadUrl('http://localhost:3000/php/xml.php', function(data) {
+    //downloadUrl(' https://00bb-45-225-44-223.ngrok.io/php/xml.php', function(data) {
+       var xml = data.responseXML;
+       var markers = xml.documentElement.getElementsByTagName('marker');
+       Array.prototype.forEach.call(markers, function(markerElem) {
+           var idmapa = markerElem.getAttribute('idmapa');
+           var lugar = markerElem.getAttribute('lugar');
+           var descripcion = markerElem.getAttribute('descripcion');
+          
+           var point = new google.maps.LatLng(
+               parseFloat(markerElem.getAttribute('lat')),
+               parseFloat(markerElem.getAttribute('lng')));
+
+               
+
+
+           const contentString =
+               '<div id="content">' +
+               '<div id="siteNotice">' +
+               "</div>" +
+               '<center>'+
+               '<h1 id="firstHeading" class="firstHeading">'+ lugar +  '</h1>' +
+               '</center>'+
+               '<br>'+
+               '<div id="bodyContent">' +
+               '<br>'+
+               "<p><b>" + descripcion + "</p>" +
+               "</p>" +
+               "</div>" +
+               "</div>";
+
+           var marker = new google.maps.Marker({
+               map: map,
+               position: point,
+               //icon: image
+           });
+           marker.addListener('click', function() {
+               infoWindow.setContent(contentString);
+               infoWindow.open(map, marker);
+           });
+       });
+   });
+
+
+/*/------------------Colocar Rutas de Buses---------------------------------
+var routes = [
+    new google.maps.LatLng(-1.666846, -78.654467)
+    , new google.maps.LatLng(-1.664873, -78.656827)
+    , new google.maps.LatLng(-1.663929, -78.657836)
+];
+
+var polyline = new google.maps.Polyline({
+    path: routes
+    , map: map
+    , strokeColor: '#ff0000'
+    , strokeWeight: 6
+    , strokeOpacity: 0.3
+    , clickable: false
+});
+
+//-------------------------------------------------------------------------------*/
+
+        var point;
+        var flightPlanCoordinates=new Array();
+        downloadUrl('http://localhost:3000/php/xmlRutas.php', function(data) {
+        //downloadUrl('http://localhost/SystemGeoLoca/xmlRutas.php', function(data) {
+        //downloadUrl(' https://00bb-45-225-44-223.ngrok.io/php/xmlRutas.php', function(data) {
+            var xml = data.responseXML;
+    
+            var markers = xml.documentElement.getElementsByTagName("markeruta");
+            for (var i = 0; i < markers.length; i++) {
+                point = new google.maps.LatLng(
+                  markers[i].getAttribute("latitud"),
+                  markers[i].getAttribute("longitud"));
+                flightPlanCoordinates[i]=point;
+              }
+            
+            var flightPath = new google.maps.Polyline({
+             path: flightPlanCoordinates,
+             geodesic: true,
+             map: map,
+             strokeColor: "#FF0000",
+             strokeOpacity: 0.5,
+             strokeWeight: 6,
+             clickable: false
+            });
+    
+        });
+//-------------------------------------Coloca la posición del Bus-----------------------------------------------
+
+
+   setInterval(function(){
+     
+       var infoWindow = new google.maps.InfoWindow;
+       downloadUrl('http://localhost/SystemGeoLoca/php/xml.php', function(data) {
+      // downloadUrl('http://localhost:3000/php/xmlBus.php', function(data) {
+     //downloadUrl('https://proyectomovilidadrio.000webhostapp.com/SystemGeoLoca/php/xmlBus.php', function(data) {
+
+      //downloadUrl(' https://00bb-45-225-44-223.ngrok.io/php/xmlBus.php', function(data) {
+       var xml = data.responseXML;
+       var markers = xml.documentElement.getElementsByTagName('marker');
+       Array.prototype.forEach.call(markers, function(markerElem) {
+           var Idlocalizacion = markerElem.getAttribute('Idlocalizacion');
+           var IdBus = markerElem.getAttribute('IdBus');
+           var velocidad = markerElem.getAttribute('velocidad');
+           Latant = markerElem.getAttribute('latitud');
+           Lngant = markerElem.getAttribute('longitud');
+           
+           var point = new google.maps.LatLng(
+               parseFloat(markerElem.getAttribute('latitud')),
+               parseFloat(markerElem.getAttribute('longitud')));
+
+            var point2 = new google.maps.LatLng(
+            parseFloat(Latant),
+            parseFloat(Lngant));
+
+
+           const contentString =
+               '<div id="content">' +
+               '<div id="siteNotice">' +
+               "</div>" +
+               '<center>'+
+               '<h1 id="firstHeading" class="firstHeading">'+ velocidad +  '</h1>' +
+               '</center>'+
+               '<br>'+
+               '<div id="bodyContent">' +
+               '<br>'+
+               "<p><b>" + IdBus + "</p>" +
+               "</p>" +
+               "</div>" +
+               "</div>";
+
+            var marker = new google.maps.Marker({
+            map: map,
+            visible:true,
+            icon: 'http://maps.google.com/mapfiles/dir_0.png',
+            position: point,
+               
+           });
+
+           marker.addListener('click', function() {
+               infoWindow.setContent(contentString);
+               infoWindow.open(map, marker);
+           });
+           
+           setTimeout(function(){
+             //marker.on('move',()=> map.removeLayer(marker));
+          // marker. setMap( null );
+          marker.setMap(null);
+          //markers.push(marker);
+           }, 2000);
+
+       });
+   });
+
+//--------------------------------
+}, 2000);
+
+// Una matriz con las coordenadas de los límites de Bucaramanga, extraídas manualmente de la base de datos GADM
+ },
+ //Si no los entrega manda un alerta de error
+ function () {
+     window.alert("nav no permitido");
+ }
+
+);
+
+}
+else
+{
+window.alert("Navegador no soportado");
+}
+
+//------------------------------------------------------------------------------  
+  
+}
+
+
+// fin de initmap-----------------------------------------------------  
+function downloadUrl(url, callback) {
+   var request = window.ActiveXObject ?
+       new ActiveXObject('Microsoft.XMLHTTP') :
+       new XMLHttpRequest;
+   request.onreadystatechange = function() {
+       if (request.readyState == 4) {
+           request.onreadystatechange = doNothing;
+           callback(request, request.status);
+       }
+   };
+   request.open('GET', url, true);
+   request.send(null);
+}
+
+function doNothing() {}
+
+
+
+//--------------------- Fin de JS
+
